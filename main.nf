@@ -8,15 +8,11 @@
  */
 params.help                = false
 params.fasta               = ""
-params.alignments          ""
+params.alignments          = ""
 log.info """\
          Freebayes parallel   
          ===================================
-         reference genome  : ${params.fasta}
-         fastq reads       : ${params.fastq}
-         outdir            : ${params.outdir}
-         centrifuge db     : ${params.centrifugedb}
-         medaka model      : ${params.medaka_model}
+
          """
          .stripIndent()
 
@@ -53,7 +49,6 @@ if (params.help) {
     exit 0
 }
 
-
 /*  initial steps
     - check that arguments are valid
     - check that fasta file exists
@@ -61,6 +56,15 @@ if (params.help) {
     - 
 */
 
+
+Channel
+    .fromFilePairs(params.alignments, checkIfExists : true) { file -> file.name.replaceAll(/.bam|.bai$/,'') }
+    .set { bam_ch }
+
+bam_ch.collect().view()
+
+
+/* 
 // required arguments
 params.alignments = false
 if( !params.alignments ) { exit 1, "--alignments is not defined" }
@@ -78,4 +82,4 @@ workflow {
     generate_intervals()
     run_freebayes()
 
-}
+} */

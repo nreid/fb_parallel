@@ -1,3 +1,4 @@
+// generates intervals of winsize with 100bp overlaps at each end
 process raw_intervals {
 
     cache 'lenient'
@@ -16,6 +17,7 @@ process raw_intervals {
     """
 }
 
+// removes unwanted genomic intervals provided in bed format
 process subtract_intervals {
 
     cache 'lenient'
@@ -33,6 +35,7 @@ process subtract_intervals {
     """
 }
 
+// creates a text file giving genome intervals in chrom:start-end format
 process convert_intervals {
 
     cache 'lenient'
