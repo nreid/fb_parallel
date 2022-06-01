@@ -34,3 +34,28 @@ process freebayes {
     """
 
 }
+
+// module to concatenate vcf files
+
+process vcf_concat {
+
+    input:
+        path vcfs
+        path regionlist
+
+    output:
+        path "freebayes.vcf.*"
+
+    script:
+    """
+    for file in \$(cat ${regionlist}); do bgzip -d -c \${file}.vcf.gz; done | \
+        vcffirstheader | \
+        vcfstreamsort -w 1000 | \
+        vcfuniq | \
+        bgzip >freebayes.vcf.gz
+
+    tabix -p vcf freebayes.vcf.gz
+    """
+
+
+}

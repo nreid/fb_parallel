@@ -1,11 +1,11 @@
 params.fasta       = '/Users/noahreid/Dropbox/cbc_projects/fb_parallel_test_data/genome/GCA_004348285.1_ASM434828v1_genomic.fna'
-params.fai         = '/Users/noahreid/Dropbox/cbc_projects/fb_parallel_test_data/genome/GCA_004348285.1_ASM434828v1_genomic.fna.fai'
+params.fai         = '/Users/noahreid/Dropbox/cbc_projects/fb_parallel_test_data/genome/fake.fai'
 params.simplebam   = '/Users/noahreid/Dropbox/cbc_projects/fb_parallel_test_data/alignments/*bam'
 params.winsize     = '1000000'
 params.exclude     = ''
 params.options     = ''
 
-include { freebayes } from '../modules/freebayes.nf'
+include { freebayes; vcf_concat } from '../modules/freebayes.nf'
 include { generate_intervals } from '../subworkflows/generate_intervals.nf'
 
 // bam channel
@@ -63,6 +63,7 @@ workflow {
     // generate_intervals.out.splitText().map{it -> it.trim()}.set{ interval_ch }
 
     freebayes( interval_ch, params.options, params.fasta, params.fai, allbam_ch)
+    vcf_concat( freebayes.out.collect(), generate_intervals.out )
 
 }
 

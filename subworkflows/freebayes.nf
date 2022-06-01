@@ -1,2 +1,67 @@
-// create a freebayes module
-// create a combine vcfs module
+include { freebayes; vcf_concat } from '../modules/freebayes.nf'
+
+workflow run_freebayes {
+    take: 
+        regions
+        options
+        fasta
+        faidx
+        bams
+
+    main:
+        // get bam channel
+        Channel
+            .fromPath(params.bams)
+            .map {file -> 
+                [file.name.replaceAll(/.bam|.bai$/,''),
+                file]
+            }
+            .set {simple_ch}
+
+
+        // bam index channel inferred from bam file names, bai stored only as string
+        Channel
+            .fromPath(params.bams, checkIfExists: true)
+            .map { file ->
+                if(file.name.endsWith('.bam')) {
+                    out = [
+                    file.name.replaceAll(/.bam|.bai$/,''), 
+                    file + '.bai'
+                    ]
+                    if(!out[1].exists()){
+                        out[1] = out[1].toString().replaceAll(/.bam.bai/,'.bai')
+                    }   
+                }        
+                out       
+            }.set{ bai_init }
+
+        // bam index channel with strings converted to paths, checking that index files exist
+        bai_init
+            .map{ list ->
+                x = file(list[1], checkIfExists: true)
+                list[1] = x
+                list
+            }
+            .set{ bai_ch }
+
+        // join bam and bai channels
+        simple_ch.join(bai_ch).set{ joint_ch }
+
+        // collect bam and bai to emit all together
+        joint_ch
+            .map { list ->
+                [ list[1], list[2] ]
+            }
+            .flatten()
+            .collect()
+            .set{ allbam_ch }
+
+
+
+        // run processes
+        freebayes(regions, options, fasta, faidx, allbam_ch)
+        vcf_concat(freebayes.out.collect(), regions)
+
+    emit:
+        vcf = vcf_concat.out
+} 
