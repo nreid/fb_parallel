@@ -36,7 +36,8 @@ process freebayes {
 
     script:
     """
-    
+    ls *bam >bam.list
+    freebayes --list bam.list 
     """
 
 }
