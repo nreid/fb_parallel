@@ -57,11 +57,7 @@ if (params.help) {
 */
 
 
-Channel
-    .fromFilePairs(params.alignments, checkIfExists : true) { file -> file.name.replaceAll(/.bam|.bai$/,'') }
-    .set { bam_ch }
 
-bam_ch.collect().view()
 
 
 /* 
@@ -70,16 +66,16 @@ params.alignments = false
 if( !params.alignments ) { exit 1, "--alignments is not defined" }
 params.fasta = false
 if( !params.fasta ) { exit 1, "--fasta is not defined" }
+ */
 
 
 // execute workflow
-include{ generate_intervals } from './subworkflows/intervals.nf'
-include{ run_freebayes      } from './subworkflows/freebayes.nf'
-
+include { generate_intervals } from './subworkflows/generate_intervals.nf'
+include { run_freebayes }      from './subworkflows/freebayes.nf'
 
 workflow {
 
-    generate_intervals()
-    run_freebayes()
+    generate_intervals( params.fai, params.winsize, params.exclude )
+    run_freebayes( generate_intervals.out, params.options, params.fasta, params.fai, params.bams )
 
-} */
+}

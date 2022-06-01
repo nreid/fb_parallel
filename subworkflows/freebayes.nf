@@ -2,7 +2,7 @@ include { freebayes; vcf_concat } from '../modules/freebayes.nf'
 
 workflow run_freebayes {
     take: 
-        regions
+        regions_file
         options
         fasta
         faidx
@@ -57,10 +57,12 @@ workflow run_freebayes {
             .set{ allbam_ch }
 
 
+        // create regions channel
+        regions_file.splitCsv().set{ regions_channel }
 
         // run processes
-        freebayes(regions, options, fasta, faidx, allbam_ch)
-        vcf_concat(freebayes.out.collect(), regions)
+        freebayes(regions_channel, options, fasta, faidx, allbam_ch)
+        vcf_concat(freebayes.out.collect(), regions_file)
 
     emit:
         vcf = vcf_concat.out
