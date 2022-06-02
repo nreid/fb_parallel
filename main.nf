@@ -1,14 +1,12 @@
 /* 
- * A pipeline to run freebayes in parallel
- * Authors: 
+    A pipeline to run freebayes in parallel
+    Authors: 
+        Noah Reid
+        Gabriel Barrett
+        Adapted from https://github.com/brwnj/freebayes-nf
  */ 
 
- /* 
- * pipeline input parameters 
- */
-params.help                = false
-params.fasta               = ""
-params.alignments          = ""
+
 log.info """\
          Freebayes parallel   
          ===================================
@@ -21,29 +19,23 @@ if (params.help) {
     -----------------------------------------------------------------------
     freebayes parallel
     =========================================
-    Output is written to <outdir>/freebayes/<project>.vcf.gz and represents
-    a decomposed and normalized VCF and its index.
+    Output is written to <outdir>
+
     required
     --------
-    --alignments   Aligned sequences in .bam and/or .cram format. Indexes
-                   (.bai/.crai) must be present.
+    --alignments   Aligned sequences in .bam format. Indexes (.bai or .bam.bai) must be present. 
     --fasta        Reference FASTA. 
-    options
+    --fai          An index (.fai) for the reference genome must be provided (e.g samtools faidx ref.fasta)
+    
     -------
-    --outdir       Base results directory for output. Default: '/.results'
-    --project      File prefix for merged and annotated VCF files.
-                   Default: 'variants'
-    --width        The genomic window size per variant calling job.
-                   Default: 5000000
+    --outdir       Base results directory for output. Default: './results'
+    --winsize      The genomic window size per variant calling job.
+                   Default: 1000000
     --options      Arguments to be passed to freebayes command in addition
                    to those already supplied like `--bam`, `--region`, and
                    `--fasta-reference`. Single quote these when specifying
                    on the command line, e.g. --options '--pooled-discrete'.
-    --intervals    Picard-style intervals file to use rather than intervals
-                   defined in .fai. Something like Broad's interval lists
-                   work here if you want to omit masked regions.
-    --exclude      Chromosome patterns to omit from variant calling.
-                   Default: 'decoy,random,Un,alt,EBV,M,HLA,phi'
+    --exclude      A BED formatted file containing regions to exclude from variant calling. 
     -----------------------------------------------------------------------
     """.stripIndent()
     exit 0
@@ -57,14 +49,9 @@ if (params.help) {
 */
 
 
-
-
-
 /* 
 // required arguments
-params.alignments = false
 if( !params.alignments ) { exit 1, "--alignments is not defined" }
-params.fasta = false
 if( !params.fasta ) { exit 1, "--fasta is not defined" }
  */
 
@@ -73,9 +60,9 @@ if( !params.fasta ) { exit 1, "--fasta is not defined" }
 include { generate_intervals } from './subworkflows/generate_intervals.nf'
 include { run_freebayes }      from './subworkflows/freebayes.nf'
 
-workflow {
+/* workflow {
 
     generate_intervals( params.fai, params.winsize, params.exclude )
-    run_freebayes( generate_intervals.out, params.options, params.fasta, params.fai, params.bams )
+    run_freebayes( generate_intervals.out, params.fboptions, params.fasta, params.fai, params.alignments )
 
-}
+} */

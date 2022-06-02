@@ -39,6 +39,8 @@ process freebayes {
 
 process vcf_concat {
 
+    publishDir "${params.outdir}/vcf_raw"
+
     input:
         path vcfs
         path regionlist
