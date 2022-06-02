@@ -6,12 +6,12 @@ workflow run_freebayes {
         options
         fasta
         faidx
-        bams
+        alignments
 
     main:
         // get bam channel
         Channel
-            .fromPath(params.bams)
+            .fromPath(alignments)
             .map {file -> 
                 [file.name.replaceAll(/.bam|.bai$/,''),
                 file]
@@ -21,7 +21,7 @@ workflow run_freebayes {
 
         // bam index channel inferred from bam file names, bai stored only as string
         Channel
-            .fromPath(params.bams, checkIfExists: true)
+            .fromPath(alignments, checkIfExists: true)
             .map { file ->
                 if(file.name.endsWith('.bam')) {
                     out = [
