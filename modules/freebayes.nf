@@ -5,6 +5,8 @@
 process freebayes {
 
     tag "${region}"
+    errorStrategy 'retry'
+    maxRetries 5
 
     input:
         val region
