@@ -6,7 +6,7 @@ process faidx {
     path fasta
 
     output:
-    path "${fasta}.fai"
+    path "${fasta}.fai", emit: faidx
 
     script:
     """
