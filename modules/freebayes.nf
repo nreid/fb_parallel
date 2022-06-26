@@ -24,9 +24,6 @@ process freebayes {
     """
     ls *bam >bam.list
 
-    # to prevent "index file is older than alignment" errors
-    for file in *bai; do touch \$file; done
-
     freebayes \
         --bam-list bam.list \
         --region ${region[0]} \
