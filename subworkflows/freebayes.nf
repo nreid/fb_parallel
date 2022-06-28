@@ -7,6 +7,7 @@ workflow run_freebayes {
         fasta
         faidx
         alignments
+        minQ
 
     main:
         // get bam channel
@@ -61,7 +62,7 @@ workflow run_freebayes {
         regions_file.splitCsv().set{ regions_channel }
 
         // run processes
-        freebayes(regions_channel, options, fasta, faidx, allbam_ch)
+        freebayes(regions_channel, options, fasta, faidx, allbam_ch, minQ)
         vcf_concat(freebayes.out.collect(), regions_file)
 
     emit:

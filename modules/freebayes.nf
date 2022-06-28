@@ -11,6 +11,7 @@ process freebayes {
     input:
         val region
         val options
+        val minQ
         path fasta
         path faidx
         path bams
@@ -29,6 +30,7 @@ process freebayes {
         --region ${region[0]} \
         --fasta-reference ${fasta} \
         ${options} | \
+        vcffilter -f 'QUAL > ${minQ} | \
         bgzip >${region[0]}.vcf.gz
     """
 

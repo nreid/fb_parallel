@@ -39,6 +39,8 @@ if (params.help) {
                     on the command line, e.g. --options '--pooled-discrete'.
     --exclude       A BED formatted file containing regions to exclude from 
                     variant calling. 
+    --minQ          Minimum variant quality to output a VCF record. 
+                    Default: 0
     -----------------------------------------------------------------------
     """.stripIndent()
     exit 0
