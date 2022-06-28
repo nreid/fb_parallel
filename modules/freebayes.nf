@@ -51,7 +51,7 @@ process vcf_concat {
     """
     for file in \$(cat ${regionlist}); do bgzip -d -c \${file}.vcf.gz; done | \
         vcffirstheader | \
-        vcfstreamsort -w 1000 | \
+        vcfstreamsort | \
         vcfuniq | \
         bgzip >freebayes.vcf.gz
 
