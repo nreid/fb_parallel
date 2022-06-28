@@ -30,7 +30,7 @@ process freebayes {
         --region ${region[0]} \
         --fasta-reference ${fasta} \
         ${options} | \
-        vcffilter -f 'QUAL > ${minQ} | \
+        vcffilter -f 'QUAL > ${minQ}' | \
         bgzip >${region[0]}.vcf.gz
     """
 
