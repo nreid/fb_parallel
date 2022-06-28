@@ -62,7 +62,7 @@ workflow run_freebayes {
         regions_file.splitCsv().set{ regions_channel }
 
         // run processes
-        freebayes(regions_channel, options, fasta, faidx, allbam_ch, minQ)
+        freebayes(regions_channel, options, minQ, fasta, faidx, allbam_ch )
         vcf_concat(freebayes.out.collect(), regions_file)
 
     emit:
