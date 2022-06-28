@@ -51,11 +51,20 @@ process vcf_concat {
 
     script:
     """
-    for file in \$(cat ${regionlist}); do bgzip -d -c \${file}.vcf.gz; done | \
-        vcffirstheader | \
-        vcfstreamsort | \
-        vcfuniq | \
-        bgzip >freebayes.vcf.gz
+    # create header file, count header lines
+    R1=\$(head -n 1 ${regionlist})
+    zcat \${R1}.vcf.gz | awk '{if (\$0 ~ /^#/) print \$0; else exit}' >header.txt
+    HL=\$(cat header.txt | wc -l)
+    START=\$(expr \$HL + 1)
+
+    # cat header file, cat all vcfs, starting at # header lines + 1, sort, uniq, bgzip
+    (
+        cat header.txt
+        for file in \$(cat ${regionlist}); do bgzip -d -c \${file}.vcf.gz | tail -n +\${START}; done
+    ) | \
+    vcfstreamsort | \
+    vcfuniq | \
+    bgzip >freebayes.vcf.gz
 
     tabix -p vcf freebayes.vcf.gz
     """
