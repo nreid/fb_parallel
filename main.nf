@@ -59,7 +59,6 @@ if (params.help) {
 if( !params.alignments ) { exit 1, "--alignments is not defined" }
 if( !params.fasta )      { exit 1, "--fasta is not defined" }
 if( !params.fai )        { exit 1, "--fai is not defined" }
-if( !params.exclude )    { params.exclude = false }; else { Channel.fromPath(params.exclude )}
 
 
 include { fb_parallel } from './workflows/fb_parallel.nf'

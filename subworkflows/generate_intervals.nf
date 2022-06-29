@@ -14,7 +14,7 @@ workflow generate_intervals {
     raw_intervals(fai, winsize)
  
     if( exclude ){
-        exclude = Channel.fromPath( params.exclude, checkIfExists: true )
+        exclude = Channel.fromPath( exclude, checkIfExists: true )
         subtract_intervals(raw_intervals.out, exclude)
         convert_intervals(subtract_intervals.out)
     }
