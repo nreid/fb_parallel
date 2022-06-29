@@ -3,7 +3,11 @@ include { run_freebayes }      from '../subworkflows/freebayes.nf'
 
 workflow fb_parallel {
 
-    generate_intervals( params.fai, params.winsize, params.exclude )
-    run_freebayes( generate_intervals.out, params.fboptions, params.fasta, params.fai, params.alignments, params.minQ )
+    fasta   = Channel.fromPath( params.fasta )
+    fai     = Channel.fromPath( params.fai )
+    exclude = Channel.fromPath( params.exclude )
+
+    generate_intervals( fai, params.winsize, exclude )
+    run_freebayes( generate_intervals.out, params.fboptions, fasta, fai, params.alignments, params.minQ )
 
 }
