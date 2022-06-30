@@ -17,7 +17,7 @@ process freebayes {
         path bams
 
     output:
-        path "${region[0]}.vcf.gz"
+        path "${region}.vcf.gz"
 
     script:
     // think about removing colon from file name
@@ -27,11 +27,11 @@ process freebayes {
 
     freebayes \
         --bam-list bam.list \
-        --region ${region[0]} \
+        --region ${region} \
         --fasta-reference ${fasta} \
         ${options} | \
         bcftools filter -i 'QUAL > ${minQ}' | \
-        bgzip >${region[0]}.vcf.gz
+        bgzip >${region}.vcf.gz
     """
 
 }

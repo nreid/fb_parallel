@@ -10,7 +10,10 @@ workflow run_freebayes {
         minQ
 
     main:
-        // get bam channel
+        // create bam channel
+            // output is an array with 2 elements, 
+                // 1. file prefix, probably sample ID
+                // 2. file path object
         Channel
             .fromPath(alignments)
             .map {file -> 
@@ -20,7 +23,14 @@ workflow run_freebayes {
             .set {simple_ch}
 
 
-        // bam index channel inferred from bam file names, bai stored only as string
+        // initial bam index channel inferred from bam file names, 
+        // attempts to deal with the fact that indexes can have .bai or .bam.bai suffixes
+            // first create array as above, but paste '.bai' onto file names
+            // check if .bam.bai files exist
+            // if they exist, output array as [ prefix, path object]
+            // if they don't exist, change .bam.bai suffix to .bai
+            // this converts the path object to a string. I was unable to simply change the path object as above
+
         Channel
             .fromPath(alignments, checkIfExists: true)
             .map { file ->
@@ -36,7 +46,9 @@ workflow run_freebayes {
                 out       
             }.set{ bai_init }
 
-        // bam index channel with strings converted to paths, checking that index files exist
+        // further manipulate the bam index channel. 
+            // run file() on each file name object, checking for existence
+            // pipeline now fails if neither .bam.bai nor .bai index files exist
         bai_init
             .map{ list ->
                 x = file(list[1], checkIfExists: true)
@@ -59,7 +71,7 @@ workflow run_freebayes {
 
 
         // create regions channel
-        regions_file.splitCsv().set{ regions_channel }
+        regions_file.splitCsv().flatten().set{ regions_channel }
 
         // run processes
         freebayes(regions_channel, options, minQ, fasta, faidx, allbam_ch )
