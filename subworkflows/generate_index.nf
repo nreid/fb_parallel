@@ -7,7 +7,7 @@ workflow index {
     params.fai
     params.fasta
     params.bai
-    params.bam
+    params.alignments
 
     main:
     // could change to if file does not exist create index
@@ -19,7 +19,7 @@ workflow index {
     }
 
     if (bai == 'false') {
-        generate_bai ( params.bam )
+        generate_bai ( params.alignments )
         bai = generate_bai.out.bai
     } else {
         bai = params.bai
