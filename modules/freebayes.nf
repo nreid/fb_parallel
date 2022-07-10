@@ -5,16 +5,19 @@
 process freebayes {
 
     tag "${region}"
+    errorStrategy 'retry'
+    maxRetries 5
 
     input:
         val region
         val options
+        val minQ
         path fasta
         path faidx
         path bams
 
     output:
-        path "${region[0]}.vcf.gz"
+        path "${region}.vcf.gz"
 
     script:
     // think about removing colon from file name
@@ -22,15 +25,13 @@ process freebayes {
     """
     ls *bam >bam.list
 
-    # to prevent "index file is older than alignment" errors
-    for file in *bai; do touch \$file; done
-
     freebayes \
         --bam-list bam.list \
-        --region ${region[0]} \
+        --region ${region} \
         --fasta-reference ${fasta} \
         ${options} | \
-        bgzip >${region[0]}.vcf.gz
+        bcftools filter -i 'QUAL > ${minQ}' | \
+        bgzip >${region}.vcf.gz
     """
 
 }
@@ -50,11 +51,20 @@ process vcf_concat {
 
     script:
     """
-    for file in \$(cat ${regionlist}); do bgzip -d -c \${file}.vcf.gz; done | \
-        vcffirstheader | \
-        vcfstreamsort -w 1000 | \
-        vcfuniq | \
-        bgzip >freebayes.vcf.gz
+    # create header file, count header lines
+    R1=\$(head -n 1 ${regionlist})
+    zcat \${R1}.vcf.gz | awk '{if (\$0 ~ /^#/) print \$0; else exit}' >header.txt
+    HL=\$(cat header.txt | wc -l)
+    START=\$(expr \$HL + 1)
+
+    # cat header file, cat all vcfs, starting at # header lines + 1, sort, uniq, bgzip
+    (
+        cat header.txt
+        for file in \$(cat ${regionlist}); do bgzip -d -c \${file}.vcf.gz | tail -n +\${START}; done
+    ) | \
+    vcfstreamsort | \
+    vcfuniq | \
+    bgzip >freebayes.vcf.gz
 
     tabix -p vcf freebayes.vcf.gz
     """

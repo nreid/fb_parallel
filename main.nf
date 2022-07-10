@@ -39,6 +39,8 @@ if (params.help) {
                     on the command line, e.g. --options '--pooled-discrete'.
     --exclude       A BED formatted file containing regions to exclude from 
                     variant calling. 
+    --minQ          Minimum variant quality to output a VCF record. 
+                    Default: 0
     -----------------------------------------------------------------------
     """.stripIndent()
     exit 0
@@ -55,18 +57,23 @@ if (params.help) {
 
 // required arguments
 if( !params.alignments ) { exit 1, "--alignments is not defined" }
-if( !params.fasta ) { exit 1, "--fasta is not defined" }
-if( !params.fai ) { exit 1, "--fai is not defined" }
+if( !params.fasta )      { exit 1, "--fasta is not defined" }
+if( !params.fai )        { exit 1, "--fai is not defined" }
 
 
+include { fb_parallel } from './workflows/fb_parallel.nf'
+ 
+workflow FB {
 
-// execute workflow
-include { generate_intervals } from './subworkflows/generate_intervals.nf'
-include { run_freebayes }      from './subworkflows/freebayes.nf'
+    fb_parallel()
+
+}
+
 
 workflow {
 
-    generate_intervals( params.fai, params.winsize, params.exclude )
-    run_freebayes( generate_intervals.out, params.fboptions, params.fasta, params.fai, params.alignments )
-
+    FB()
+    
 }
+
+// execute workflow

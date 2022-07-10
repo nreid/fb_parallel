@@ -52,7 +52,7 @@ if (params.help) {
 */
 
 // required arguments
-if( !params.alignments ) { exit 1, "--alignments is not defined" }
+if( !params.bam ) { exit 1, "--alignments is not defined" }
 if( !params.fasta ) { exit 1, "--fasta is not defined" }
 if( !params.fai ) { exit 1, "--fai is not defined" }
 
@@ -63,8 +63,8 @@ include { run_freebayes }      from '../subworkflows/freebayes.nf'
 
 workflow {
 
-    generate_intervals( params.fai, params.winsize, params.exclude )
-    run_freebayes( generate_intervals.out, params.fboptions, params.fasta, params.fai, params.alignments )
-
+    generate_index ( params.fai, params.fasta, params.bai, params.bam)
+    generate_intervals ( params.fai, params.winsize, params.exclude )
+    run_freebayes ( generate_intervals.out, params.fboptions, params.fasta, params.fai, params.alignments )
 
 }

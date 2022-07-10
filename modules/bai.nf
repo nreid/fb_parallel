@@ -5,7 +5,7 @@ process bai {
     path ( bam )
 
     output:
-    tuple val (id), path ("*.bai"),  path ("*.bam"), emit: aln
+    tuple val (id), path ("*.bam"),  path ("*.bai"), emit: aln
 
     script:
     """
