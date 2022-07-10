@@ -2,7 +2,16 @@ include { generate_fai } from '../modules/faidx.nf'
 include { generate_bai } from '../modules/bai.nf'
 
 workflow index {
-    if (params.fai == 'false') {
+    
+    take:
+    params.fai
+    params.fasta
+    params.bai
+    params.bam
+
+    main:
+    // could change to if file does not exist create index
+    if (params.fai == 'false') { 
         generate_fai ( params.fasta )
         fai = generate_fai.out.fai
     } else {
@@ -15,4 +24,9 @@ workflow index {
     } else {
         bai = params.bai
     }
+
+    emit:
+    fai
+    bai
+
 }
