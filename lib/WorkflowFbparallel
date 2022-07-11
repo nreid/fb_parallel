@@ -1,0 +1,15 @@
+
+
+class WorkflowFbparallel {
+
+    public static void initialize(params, log) {
+
+    }
+
+    private static void checkbai(log) {
+            log.warn "=============================================================================\n" +
+                "  bai index files were empty. Created new bai files.\n" +
+                "==================================================================================="
+        }
+
+}

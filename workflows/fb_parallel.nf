@@ -3,7 +3,9 @@ include { generate_intervals } from '../subworkflows/generate_intervals.nf'
 include { run_freebayes }      from '../subworkflows/freebayes.nf'
 
 
+/*checkPathParams = [
 
+]*/
 
 
 // Check if file with list of fastas is provided when running BBSplit
@@ -14,10 +16,10 @@ if (!params.bai && !params.bbsplit_index && params.bbsplit_fasta_list) {
 
 workflow fb_parallel {
 
-    fasta   =  path ( params.fasta )
-    fai     = path ( params.fai )
+    fasta          = path ( params.fasta )
+    fai            = path ( params.fai )
     alignments     = path ( params.alignments )
-    bai     = path ( params.bai )
+    bai            = path ( params.bai )
 
     generate_index ( fai, fasta, params.bai, params.alignments)
     generate_intervals( fai, params.winsize, params.exclude )
