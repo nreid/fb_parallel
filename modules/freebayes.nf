@@ -17,7 +17,7 @@ process freebayes {
         path bams
 
     output:
-        path "${region[0]}.vcf.gz"
+        path "${region}.test.vcf.gz"
 
     script:
     // think about removing colon from file name
@@ -27,11 +27,11 @@ process freebayes {
 
     freebayes \
         --bam-list bam.list \
-        --region ${region[0]} \
+        --region ${region} \
         --fasta-reference ${fasta} \
         ${options} | \
         bcftools filter -i 'QUAL > ${minQ}' | \
-        bgzip >${region[0]}.vcf.gz
+        bgzip > ${region}.test.vcf.gz
     """
 
 }
@@ -47,7 +47,7 @@ process vcf_concat {
         path regionlist
 
     output:
-        path "freebayes.vcf.*"
+    tuple path ("*.vcf.gz"), path ("*.tbi"), emit: concat_vcf
 
     script:
     """
@@ -64,9 +64,9 @@ process vcf_concat {
     ) | \
     vcfstreamsort | \
     vcfuniq | \
-    bgzip >freebayes.vcf.gz
+    bgzip >freebayes.test.vcf.gz
 
-    tabix -p vcf freebayes.vcf.gz
+    tabix -p vcf freebayes.test.vcf.gz
     """
 
 

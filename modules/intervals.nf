@@ -13,7 +13,7 @@ process raw_intervals {
     script:
     """
     slide=\$(expr ${winsize} - 100)
-    bedtools makewindows -g ${fai} -w ${winsize} -s \$slide >raw_intervals.bed
+    bedtools makewindows -g ${fai} -w ${winsize} -s \$slide > raw_intervals.bed
     """
 }
 
@@ -31,7 +31,7 @@ process subtract_intervals {
 
     script:
     """
-    bedtools subtract -a ${rawbed} -b ${excludebed} >subtracted.bed
+    bedtools subtract -a ${rawbed} -b ${excludebed} > subtracted.bed
     """
 }
 
@@ -48,6 +48,6 @@ process convert_intervals {
     
     script:
     """
-    awk '{print \$1":"\$2+1"-"\$3}' ${bed} >intervals.txt
+    awk '{print \$1":"\$2+1"-"\$3}' ${bed} > intervals.txt
     """
 }

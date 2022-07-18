@@ -16,9 +16,6 @@ log.info """\
 
 if (params.help) {
     log.info """
-    -----------------------------------------------------------------------
-    freebayes parallel
-    =========================================
     Output is written to <outdir>
 
     required

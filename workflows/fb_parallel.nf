@@ -3,11 +3,12 @@ include { run_freebayes }      from '../subworkflows/freebayes.nf'
 
 workflow fb_parallel {
 
-    fasta   = Channel.fromPath( params.fasta )
-    fai     = Channel.fromPath( params.fai )
-    exclude = Channel.fromPath( params.exclude )
+    fasta          = file ( params.fasta )
+    fai            = file ( params.fai )
+    alignments     = file ( params.alignments )
+    //bai            = path ( params.bai ) unable to invoke path here?
 
-    generate_intervals( fai, params.winsize, exclude )
-    run_freebayes( generate_intervals.out, params.fboptions, fasta, fai, params.alignments, params.minQ )
+    generate_intervals( fai, params.winsize, params.exclude )
+    run_freebayes( generate_intervals.out, params.fboptions, fasta, fai, alignments, params.minQ )
 
 }
