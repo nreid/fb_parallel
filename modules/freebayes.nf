@@ -29,7 +29,7 @@ process freebayes {
         --bam-list bam.list \
         --region "${region}" \
         --fasta-reference ${fasta} \
-        ${options} | \
+        "${options}" | \
         bcftools filter -i 'QUAL > ${minQ}' | \
         bgzip >"${region}.vcf.gz"
     """
