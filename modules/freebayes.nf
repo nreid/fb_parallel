@@ -27,11 +27,11 @@ process freebayes {
 
     freebayes \
         --bam-list bam.list \
-        --region ${region} \
+        --region "${region}" \
         --fasta-reference ${fasta} \
         ${options} | \
         bcftools filter -i 'QUAL > ${minQ}' | \
-        bgzip >${region}.vcf.gz
+        bgzip >"${region}.vcf.gz"
     """
 
 }
@@ -53,14 +53,14 @@ process vcf_concat {
     """
     # create header file, count header lines
     R1=\$(head -n 1 ${regionlist})
-    zcat \${R1}.vcf.gz | awk '{if (\$0 ~ /^#/) print \$0; else exit}' >header.txt
+    zcat "\${R1}.vcf.gz" | awk '{if (\$0 ~ /^#/) print \$0; else exit}' >header.txt
     HL=\$(cat header.txt | wc -l)
     START=\$(expr \$HL + 1)
 
     # cat header file, cat all vcfs, starting at # header lines + 1, sort, uniq, bgzip
     (
         cat header.txt
-        for file in \$(cat ${regionlist}); do bgzip -d -c \${file}.vcf.gz | tail -n +\${START}; done
+        for file in \$(cat ${regionlist}); do bgzip -d -c "\${file}.vcf.gz" | tail -n +\${START}; done
     ) | \
     vcfstreamsort | \
     vcfuniq | \
